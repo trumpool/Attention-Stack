@@ -2,6 +2,11 @@
 set -euo pipefail
 TASK_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$TASK_ROOT"
+TASK_VERSION="$(cat "$TASK_ROOT/VERSION")"
+if [[ ! "$TASK_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "VERSION must contain a version such as 1.0.0." >&2
+    exit 1
+fi
 scripts/swift.sh build -c release --product AttentionStack
 TASK_BINARY="$TASK_ROOT/.build/release/AttentionStack"
 TASK_APP="$TASK_ROOT/dist/Attention Stack.app"
@@ -27,6 +32,7 @@ cat > "$TASK_APP/Contents/Info.plist" <<'PLIST'
     <key>NSPrincipalClass</key><string>NSApplication</string>
 </dict></plist>
 PLIST
+/usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $TASK_VERSION" "$TASK_APP/Contents/Info.plist"
 /usr/bin/codesign --force --sign - "$TASK_APP"
 /usr/bin/ditto -c -k --sequesterRsrc --keepParent "$TASK_APP" "$TASK_ROOT/dist/Attention-Stack-mac.zip"
 echo "已构建：$TASK_APP"

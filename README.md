@@ -2,7 +2,34 @@
 
 一个原生 macOS 菜单栏专注栈。需要 macOS 14 或更新版本；本次构建适用于 Apple Silicon Mac。
 
-## 打开
+## 用 Homebrew 安装
+
+```sh
+brew tap trumpool/attention-stack https://github.com/trumpool/Attention-Stack.git
+brew install --cask trumpool/attention-stack/attention-stack
+open -a "Attention Stack"
+```
+
+安装到「应用程序」文件夹，支持 Apple Silicon、macOS 14 及以上版本。这个仓库同时提供自定义 Homebrew tap，所以首次安装需要上面的 `brew tap`。完整的安装名称也适用于 Homebrew 7 的自定义 tap 信任机制。[Homebrew tap 说明](https://docs.brew.sh/Taps)
+
+更新：
+
+```sh
+brew update
+brew upgrade --cask trumpool/attention-stack/attention-stack
+```
+
+卸载应用：
+
+```sh
+brew uninstall --cask trumpool/attention-stack/attention-stack
+```
+
+普通卸载会保留本地事项和归档。当前构建采用临时签名，尚未做 Apple Developer 公证；如果 macOS 阻止打开，请在「系统设置 → 隐私与安全性」中查看并批准这次打开。
+
+也可以从 [版本 1.0.0 的安装包](https://github.com/trumpool/Attention-Stack/raw/refs/tags/v1.0.0/downloads/Attention-Stack-1.0.0-arm64.zip) 下载并解压。
+
+## 从源码打开
 
 双击 `dist/Attention Stack.app`。也可以把它拖入「应用程序」文件夹。菜单栏的叠层图标可以找回、隐藏或退出悬浮窗。应用采用本机临时签名，尚未做 Apple Developer 公证。
 
@@ -37,3 +64,13 @@
 ```
 
 源码采用 SwiftUI / AppKit，无第三方依赖。`Package.swift` 可以在 Xcode 中打开。构建脚本对部分升级后残留旧文件的 Command Line Tools 做项目内兼容处理，不改动系统开发工具。
+
+## 发布 Homebrew 更新
+
+维护者先把 `VERSION` 改为新的三段版本号，在 Apple Silicon Mac 上运行：
+
+```sh
+./scripts/prepare-homebrew-release.sh
+```
+
+脚本构建并验证应用，生成版本化安装包、SHA-256 文件和 Cask。将这些文件提交到 `main` 后，为这个提交创建匹配的 `v<版本号>` 标签，并把 `main` 与标签一起推送。Cask 下载标签下的固定安装包，Homebrew 校验其 SHA-256；已经发布的包与标签应保持不变。这个仓库中的下载包仅包含应用，不包含任何本地事项数据。
