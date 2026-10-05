@@ -35,8 +35,7 @@ cask "attention-stack" do
   version "$TASK_VERSION"
   sha256 "$TASK_SHA"
 
-  url "https://raw.githubusercontent.com/trumpool/Attention-Stack/v#{version}/downloads/Attention-Stack-#{version}-arm64.zip",
-      verified: "raw.githubusercontent.com/trumpool/Attention-Stack/"
+  url "https://raw.githubusercontent.com/trumpool/Attention-Stack/v#{version}/downloads/Attention-Stack-#{version}-arm64.zip"
   name "Attention Stack"
   desc "Floating focus stack with local task history"
   homepage "https://github.com/trumpool/Attention-Stack"
