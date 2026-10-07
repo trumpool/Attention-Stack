@@ -27,7 +27,7 @@ brew uninstall --cask trumpool/attention-stack/attention-stack
 
 普通卸载会保留本地事项和归档。当前构建采用临时签名，尚未做 Apple Developer 公证；如果 macOS 阻止打开，请在「系统设置 → 隐私与安全性」中查看并批准这次打开。
 
-也可以从 [版本 1.1.0 的安装包](https://github.com/trumpool/Attention-Stack/raw/refs/tags/v1.1.0/downloads/Attention-Stack-1.1.0-arm64.zip) 下载并解压。
+也可以从 [版本 1.1.1 的安装包](https://github.com/trumpool/Attention-Stack/raw/refs/tags/v1.1.1/downloads/Attention-Stack-1.1.1-arm64.zip) 下载并解压。
 
 ## 从源码打开
 
@@ -36,7 +36,7 @@ brew uninstall --cask trumpool/attention-stack/attention-stack
 ## 使用
 
 - 点击顶部胶囊展开；点击右上角箭头或按 Esc 收起。
-- 输入想法，按 Return 入栈。输入框旁可以选择「前面 / 后面」：前面优先接续，后面按序等待。默认前面，应用会记住上次选择。新事项不会打断当前专注；没有当前事项时，第一项直接开始专注。
+- 输入想法，按 Return 入栈。点击输入框旁的按钮，直接切换「前面 / 后面」：前面优先接续，后面按序等待。默认前面，应用会记住上次选择。新事项不会打断当前专注；没有当前事项时，第一项直接开始专注。
 - 勾选当前事项：自动归档，然后开始待办最前面的事项。完成提示提供短暂的「撤销」。切换入栈选项只影响后续新增事项，不改变已有待办的顺序。
 - 拖动待办到绿色专注区，立即切换当前事项。原事项回到待办栈顶，专注计时暂停。
 - 拖动待办到另一行之前可排序；拖到列表末尾可放到底部。每行右侧上箭头也可以切换专注。

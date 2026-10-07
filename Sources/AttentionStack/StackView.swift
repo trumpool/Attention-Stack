@@ -304,25 +304,23 @@ struct StackView: View {
                 .textFieldStyle(.plain).font(.system(size: 12))
                 .focused($inputFocused).onSubmit(addDraft)
                 .accessibilityLabel("新的待办事项")
-            Menu {
-                Picker("入栈位置", selection: $store.insertionPosition) {
-                    Text("前面 · 优先接续").tag(InsertionPosition.front)
-                    Text("后面 · 按序等待").tag(InsertionPosition.back)
-                }
-                .pickerStyle(.inline)
+            Button {
+                store.insertionPosition = store.insertionPosition == .front ? .back : .front
+                inputFocused = true
             } label: {
                 HStack(spacing: 4) {
+                    Image(systemName: store.insertionPosition == .front ? "arrow.up.to.line" : "arrow.down.to.line")
+                        .font(.system(size: 9, weight: .semibold))
                     Text(store.insertionPosition == .front ? "前面" : "后面")
-                    Image(systemName: "chevron.down").font(.system(size: 8, weight: .semibold))
                 }
                 .font(.system(size: 10, weight: .medium))
                 .padding(.horizontal, 8).padding(.vertical, 6)
                 .background(Palette.lilac.opacity(0.09), in: RoundedRectangle(cornerRadius: 6))
             }
-            .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+            .buttonStyle(SoftPressStyle()).fixedSize()
             .foregroundStyle(Palette.lilac)
-            .help("选择新事项放在待办前面或后面，不打断当前专注")
-            .accessibilityLabel("入栈位置：\(store.insertionPosition == .front ? "前面" : "后面")")
+            .help("点击切换到待办\(store.insertionPosition == .front ? "后面" : "前面")入栈")
+            .accessibilityLabel("入栈位置：\(store.insertionPosition == .front ? "前面" : "后面")，点击切换到\(store.insertionPosition == .front ? "后面" : "前面")")
             Button(action: addDraft) {
                 Image(systemName: "arrow.turn.down.left").font(.system(size: 10, weight: .medium))
                     .frame(width: 25, height: 25)
