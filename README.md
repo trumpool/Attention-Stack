@@ -2,6 +2,12 @@
 
 一个原生 macOS 菜单栏专注栈。需要 macOS 14 或更新版本；本次构建适用于 Apple Silicon Mac。
 
+## 下载安装包
+
+下载 [Attention Stack 1.1.2 的 DMG 安装包](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.1.2-arm64.dmg)，双击打开，将 `Attention Stack.app` 拖到旁边的 `Applications` 文件夹，再从「应用程序」启动。安装完成后推出安装磁盘即可。
+
+这个安装包和 Homebrew 版本使用相同的应用。当前版本尚未做 Apple Developer 公证；如果 macOS 阻止首次打开，请在「系统设置 → 隐私与安全性」中查看这次打开提示。
+
 ## 用 Homebrew 安装
 
 ```sh
@@ -61,10 +67,13 @@ brew uninstall --cask trumpool/attention-stack/attention-stack
 
 ```sh
 ./scripts/build-app.sh
+./scripts/build-dmg.sh
 ./scripts/swift.sh test --disable-xctest
 ```
 
 源码采用 SwiftUI / AppKit，无第三方依赖。`Package.swift` 可以在 Xcode 中打开。构建脚本对部分升级后残留旧文件的 Command Line Tools 做项目内兼容处理，不改动系统开发工具。
+
+`build-dmg.sh` 会在 `dist/` 生成带版本号的 DMG，内含应用、「应用程序」快捷方式和安装说明。发布时将 DMG 及其 SHA-256 文件放进 `downloads/`，已经发布的文件应保持不变。
 
 ## 发布 Homebrew 更新
 
