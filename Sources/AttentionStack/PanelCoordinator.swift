@@ -21,8 +21,15 @@ final class PanelCoordinator: ObservableObject {
     private var storedCenter: CGFloat?
     private var storedTop: CGFloat?
     private var hasPosition = false
+    private var expandedHeight: CGFloat = 760
+    private var resizeStartHeight: CGFloat?
+    private var resizeAnchorTop: CGFloat?
 
     func start(store: StackStore) {
+        let savedHeight = UserDefaults.standard.double(forKey: "panel.expandedHeight")
+        if savedHeight.isFinite && savedHeight >= 480 {
+            expandedHeight = savedHeight
+        }
         let panel = FloatingPanel(contentRect: .zero,
                                   styleMask: [.borderless, .nonactivatingPanel],
                                   backing: .buffered, defer: false)
@@ -98,10 +105,39 @@ final class PanelCoordinator: ObservableObject {
         UserDefaults.standard.set(panel.frame.maxY, forKey: "panel.topY")
     }
 
+    func beginHeightResize() {
+        guard isExpanded, let panel else { return }
+        resizeStartHeight = height
+        resizeAnchorTop = panel.frame.maxY
+    }
+
+    func dragHeight(by delta: CGFloat) {
+        guard let start = resizeStartHeight, let top = resizeAnchorTop,
+              let screen = panel?.screen, delta.isFinite else { return }
+        let available = top - screen.visibleFrame.minY - 8
+        let minimum = min(480, available)
+        expandedHeight = min(max(start + delta, minimum), available)
+        resize(animated: false)
+    }
+
+    func endHeightResize() {
+        guard resizeStartHeight != nil else { return }
+        resizeStartHeight = nil
+        resizeAnchorTop = nil
+        UserDefaults.standard.set(expandedHeight, forKey: "panel.expandedHeight")
+        didDrag()
+    }
+
+    func adjustHeight(by delta: CGFloat) {
+        beginHeightResize()
+        dragHeight(by: delta)
+        endHeightResize()
+    }
+
     private func resize(animated: Bool) {
         guard let panel else { return }
         let center = storedCenter ?? NSScreen.main?.visibleFrame.midX ?? 600
-        let top = storedTop ?? NSScreen.main?.visibleFrame.maxY ?? 800
+        let top = resizeAnchorTop ?? storedTop ?? NSScreen.main?.visibleFrame.maxY ?? 800
         let screen = NSScreen.screens.first {
             $0.frame.contains(NSPoint(x: center, y: top - 20))
         } ?? panel.screen ?? NSScreen.main
@@ -110,9 +146,9 @@ final class PanelCoordinator: ObservableObject {
         let smallPreview = Bundle.main.bundleIdentifier?.hasSuffix(".qa") == true &&
             UserDefaults.standard.bool(forKey: "qa.smallPreview")
         width = min(smallPreview && isExpanded ? 340 : isExpanded ? 440 : 392, safe.width)
-        height = min(smallPreview && isExpanded ? 480 : isExpanded ? 638 : 74, safe.height)
+        height = min(smallPreview && isExpanded ? 480 : isExpanded ? expandedHeight : 74, safe.height)
         let x = min(max(center - width / 2, safe.minX), safe.maxX - width)
-        let anchorTop = hasPosition ? top : safe.maxY
+        let anchorTop = resizeAnchorTop ?? (hasPosition ? top : safe.maxY)
         let y = min(max(anchorTop - height, safe.minY), safe.maxY - height)
         let frame = NSRect(x: x, y: y, width: width, height: height)
         if animated {

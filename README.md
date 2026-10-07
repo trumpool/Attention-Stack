@@ -10,7 +10,7 @@
 
 ### 安装
 
-[下载 DMG 安装包 · v1.1.2](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.1.2-arm64.dmg)
+[下载 DMG 安装包 · v1.2.0](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.2.0-arm64.dmg)
 
 双击打开，把 `Attention Stack.app` 拖进 `Applications`，再从「应用程序」启动。
 
@@ -30,6 +30,7 @@ open -a "Attention Stack"
 - 点击按钮切换入栈位置：**暖橙色「前面」**优先接续，**天蓝色「后面」**按序等待。箭头和小栈高亮提示落点，应用会记住选择。
 - 勾选当前事项：自动归档，开始待办最前面的事项；完成提示支持短暂撤销。
 - 拖动待办到专注区可立即切换；拖动列表中的事项可调整顺序。
+- 拖动面板底部的高度手柄，增高或缩短待办区域；高度会记住，并限制在屏幕内。右侧滚动条可直接拖动，查看更多事项。
 - 点击顶部胶囊展开，按 Esc 收起；拖动标题区域移动窗口。
 - 归档包含入栈时间、出栈时间和专注时长，支持搜索、JSON 导出及再次入栈。
 
@@ -54,7 +55,7 @@ Requires an **Apple Silicon Mac and macOS 14 or later**.
 
 ### Install
 
-[Download the DMG installer · v1.1.2](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.1.2-arm64.dmg)
+[Download the DMG installer · v1.2.0](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.2.0-arm64.dmg)
 
 Open the DMG, drag `Attention Stack.app` into `Applications`, then launch it from Applications.
 
@@ -74,6 +75,7 @@ This build is ad-hoc signed and is not notarized by Apple. If macOS blocks the f
 - Click the position button to switch between **orange Front (前面)** for priority and **blue Back (后面)** for waiting in order. Arrows and a stack marker show the destination. Your choice is remembered.
 - Check off the current task to archive it and start the first waiting task. A brief undo option is available.
 - Drag a waiting task into the focus area to start it, or drag tasks within the list to reorder them.
+- Drag the height handle at the bottom to resize the waiting area. The height is remembered and stays within the screen. Drag the scrollbar on the right to see more tasks.
 - Click the top pill to expand, press Esc to collapse, and drag the header to move the window.
 - The archive records enqueue and completion times, plus focus duration. Search, export to JSON, or repeat an archived task.
 

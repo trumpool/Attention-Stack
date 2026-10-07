@@ -126,12 +126,15 @@ struct StackView: View {
     }
 
     private var expanded: some View {
-        Group {
-            if coordinator.height < 570 {
-                ScrollView { expandedContent }.scrollIndicators(.hidden)
-            } else {
-                expandedContent
+        VStack(spacing: 0) {
+            Group {
+                if coordinator.height < 570 {
+                    ScrollView { expandedContent }.scrollIndicators(.visible)
+                } else {
+                    expandedContent
+                }
             }
+            heightHandle
         }
         .clipShape(RoundedRectangle(cornerRadius: 27))
         .background {
@@ -170,7 +173,22 @@ struct StackView: View {
             }
             footer
         }
-        .padding(20)
+        .padding(.horizontal, 20).padding(.top, 20).padding(.bottom, 8)
+    }
+
+    private var heightHandle: some View {
+        ZStack {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.up.and.down").foregroundStyle(Palette.lilac)
+                Capsule().fill(Palette.lilac.opacity(0.45)).frame(width: 38, height: 4)
+                Text("上下拖动调整高度").foregroundStyle(Palette.muted)
+            }
+            .font(.system(size: 9, weight: .medium))
+            .accessibilityHidden(true)
+            PanelHeightDragRegion(coordinator: coordinator)
+        }
+        .frame(maxWidth: .infinity).frame(height: 24)
+        .padding(.horizontal, 20).padding(.bottom, 10)
     }
 
     private var header: some View {
@@ -383,7 +401,8 @@ struct StackView: View {
                         Color.clear.frame(height: 22)
                     }
                     .padding(.vertical, 2)
-                }.scrollIndicators(.hidden)
+                    .background(VisibleVerticalScroller())
+                }.scrollIndicators(.visible)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
