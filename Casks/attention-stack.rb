@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 cask "attention-stack" do
-  version "1.1.1"
-  sha256 "c3e997753922775b494a64e8d45080543c0acbab589d222da8f01e34b33102f1"
+  version "1.1.2"
+  sha256 "a6764e2c8074db2d6e79489e6b21c804b515376c6600a062373e51313e90e308"
 
   url "https://raw.githubusercontent.com/trumpool/Attention-Stack/v#{version}/downloads/Attention-Stack-#{version}-arm64.zip"
   name "Attention Stack"

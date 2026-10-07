@@ -5,6 +5,8 @@ import SwiftUI
 private enum Palette {
     static let mint = Color(red: 0.65, green: 0.96, blue: 0.82)
     static let lilac = Color(red: 0.76, green: 0.72, blue: 1)
+    static let insertionFront = Color(red: 1, green: 0.76, blue: 0.42)
+    static let insertionBack = Color(red: 0.45, green: 0.76, blue: 1)
     static let muted = Color(red: 0.58, green: 0.60, blue: 0.67)
     static let background = Color(red: 0.065, green: 0.074, blue: 0.10)
 }
@@ -297,42 +299,59 @@ struct StackView: View {
         .accessibilityLabel("完成当前事项并开始下一项")
     }
 
+    private var insertionColor: Color {
+        store.insertionPosition == .front ? Palette.insertionFront : Palette.insertionBack
+    }
+
     private var addField: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "plus").font(.system(size: 13)).foregroundStyle(Palette.lilac)
-            TextField("想到什么，就放进来…", text: $draft)
-                .textFieldStyle(.plain).font(.system(size: 12))
-                .focused($inputFocused).onSubmit(addDraft)
-                .accessibilityLabel("新的待办事项")
-            Button {
-                store.insertionPosition = store.insertionPosition == .front ? .back : .front
-                inputFocused = true
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: store.insertionPosition == .front ? "arrow.up.to.line" : "arrow.down.to.line")
-                        .font(.system(size: 9, weight: .semibold))
-                    Text(store.insertionPosition == .front ? "前面" : "后面")
+        VStack(spacing: 9) {
+            HStack(spacing: 10) {
+                Image(systemName: "plus").font(.system(size: 13)).foregroundStyle(insertionColor)
+                TextField("想到什么，就放进来…", text: $draft)
+                    .textFieldStyle(.plain).font(.system(size: 12))
+                    .focused($inputFocused).onSubmit(addDraft)
+                    .accessibilityLabel("新的待办事项")
+                Button {
+                    store.insertionPosition = store.insertionPosition == .front ? .back : .front
+                    inputFocused = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: store.insertionPosition == .front ? "arrow.up.to.line" : "arrow.down.to.line")
+                            .font(.system(size: 9, weight: .semibold))
+                        Text(store.insertionPosition == .front ? "前面" : "后面")
+                    }
+                    .font(.system(size: 10, weight: .medium))
+                    .padding(.horizontal, 8).padding(.vertical, 6)
+                    .background(insertionColor.opacity(0.16), in: RoundedRectangle(cornerRadius: 6))
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(insertionColor.opacity(0.3)))
                 }
-                .font(.system(size: 10, weight: .medium))
-                .padding(.horizontal, 8).padding(.vertical, 6)
-                .background(Palette.lilac.opacity(0.09), in: RoundedRectangle(cornerRadius: 6))
+                .buttonStyle(SoftPressStyle()).fixedSize()
+                .foregroundStyle(insertionColor)
+                .help("点击切换到待办\(store.insertionPosition == .front ? "后面" : "前面")入栈")
+                .accessibilityLabel("入栈位置：\(store.insertionPosition == .front ? "前面" : "后面")，点击切换到\(store.insertionPosition == .front ? "后面" : "前面")")
+                Button(action: addDraft) {
+                    Image(systemName: "arrow.turn.down.left").font(.system(size: 10, weight: .medium))
+                        .frame(width: 25, height: 25)
+                        .background(insertionColor.opacity(draft.isEmpty ? 0.05 : 0.16), in: RoundedRectangle(cornerRadius: 6))
+                }
+                .buttonStyle(.plain).foregroundStyle(insertionColor)
+                .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .help("入栈 · Return").accessibilityLabel("将新事项入栈")
             }
-            .buttonStyle(SoftPressStyle()).fixedSize()
-            .foregroundStyle(Palette.lilac)
-            .help("点击切换到待办\(store.insertionPosition == .front ? "后面" : "前面")入栈")
-            .accessibilityLabel("入栈位置：\(store.insertionPosition == .front ? "前面" : "后面")，点击切换到\(store.insertionPosition == .front ? "后面" : "前面")")
-            Button(action: addDraft) {
-                Image(systemName: "arrow.turn.down.left").font(.system(size: 10, weight: .medium))
-                    .frame(width: 25, height: 25)
-                    .background(Palette.lilac.opacity(draft.isEmpty ? 0.05 : 0.16), in: RoundedRectangle(cornerRadius: 6))
+            HStack(spacing: 7) {
+                InsertionMarker(isFront: store.insertionPosition == .front, color: insertionColor)
+                Text(store.insertionPosition == .front ? "新事项 → 待办最前" : "新事项 → 待办末尾")
+                    .foregroundStyle(insertionColor)
+                Spacer(minLength: 0)
+                Text(store.insertionPosition == .front ? "优先接续" : "按序等待")
+                    .foregroundStyle(Palette.muted)
             }
-            .buttonStyle(.plain).foregroundStyle(Palette.lilac)
-            .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            .help("入栈 · Return").accessibilityLabel("将新事项入栈")
+            .font(.system(size: 9, weight: .medium))
         }
         .padding(.horizontal, 13).padding(.vertical, 11)
-        .background(.white.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(inputFocused ? Palette.lilac.opacity(0.35) : .white.opacity(0.07)))
+        .background(insertionColor.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(insertionColor.opacity(inputFocused ? 0.45 : 0.22)))
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: store.insertionPosition)
     }
 
     private var queue: some View {
@@ -442,7 +461,8 @@ struct StackView: View {
                     Button("撤销", action: store.undo).buttonStyle(.plain).foregroundStyle(Palette.lilac)
                 }
             } else {
-                Image(systemName: "arrow.down.to.line.compact")
+                Image(systemName: store.insertionPosition == .front ? "arrow.up.to.line" : "arrow.down.to.line")
+                    .foregroundStyle(insertionColor)
                 Text(store.insertionPosition == .front ? "新事项放在前面，优先接续" : "新事项放在后面，按序等待")
                 Spacer()
             }
@@ -566,6 +586,25 @@ private struct RowFramesKey: PreferenceKey {
     static let defaultValue: [UUID: CGRect] = [:]
     static func reduce(value: inout [UUID: CGRect], nextValue: () -> [UUID: CGRect]) {
         value.merge(nextValue(), uniquingKeysWith: { _, new in new })
+    }
+}
+
+private struct InsertionMarker: View {
+    let isFront: Bool
+    let color: Color
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            VStack(spacing: 3) {
+                ForEach(0..<3) { _ in
+                    Capsule().fill(.white.opacity(0.15)).frame(width: 18, height: 2)
+                }
+            }
+            Capsule().fill(color).frame(width: 18, height: 2)
+                .offset(y: isFront ? 0 : 10)
+        }
+        .frame(width: 18, height: 12)
+        .accessibilityHidden(true)
     }
 }
 
