@@ -37,6 +37,54 @@ struct AttentionStateTests {
         #expect(stack.complete() == nil)
     }
 
+    @Test func backInsertionKeepsArrivalOrderAndAdvancesFromFront() {
+        var stack = AttentionState()
+        let current = stack.add("正在做", at: start)!
+        stack.add("先想到", position: .back, at: start.addingTimeInterval(10))
+        let last = stack.add("后想到", position: .back, at: start.addingTimeInterval(20))!
+        #expect(stack.current?.id == current)
+        #expect(stack.pending.map(\.title) == ["先想到", "后想到"])
+        #expect(stack.pending.last?.id == last)
+        #expect(stack.pending.last?.enqueuedAt == start.addingTimeInterval(20))
+        stack.complete(at: start.addingTimeInterval(30))
+        #expect(stack.current?.title == "先想到")
+        #expect(stack.pending.map(\.title) == ["后想到"])
+    }
+
+    @Test func frontAndBackInsertionCanBeMixedWithoutChangingExistingOrder() {
+        var stack = AttentionState()
+        stack.add("当前", at: start)
+        stack.add("A", position: .back, at: start)
+        stack.add("B", position: .back, at: start)
+        stack.add("优先", position: .front, at: start)
+        stack.add("最后", position: .back, at: start)
+        #expect(stack.pending.map(\.title) == ["优先", "A", "B", "最后"])
+        #expect(stack.current?.title == "当前")
+    }
+
+    @Test func backInsertionIntoEmptyStackBeginsFocus() {
+        var stack = AttentionState()
+        let id = stack.add("第一件", position: .back, at: start)
+        #expect(stack.current?.id == id)
+        #expect(stack.current?.focusedAt == start)
+        #expect(stack.pending.isEmpty)
+        #expect(stack.add(" \n ", position: .back, at: start) == nil)
+    }
+
+    @Test func repeatedTaskUsesSelectedPositionAndPreservesArchive() {
+        var stack = AttentionState()
+        let archived = stack.add("重做", at: start)!
+        stack.complete(at: start.addingTimeInterval(10))
+        stack.add("当前", at: start.addingTimeInterval(20))
+        stack.add("等待", at: start.addingTimeInterval(30))
+        stack.restore(archived, position: .back, at: start.addingTimeInterval(40))
+        #expect(stack.pending.map(\.title) == ["等待", "重做"])
+        #expect(stack.pending.last?.id != archived)
+        #expect(stack.pending.last?.enqueuedAt == start.addingTimeInterval(40))
+        #expect(stack.archive.count == 1)
+        #expect(stack.archive.first?.id == archived)
+    }
+
     @Test func switchingFocusPreservesWaitingTaskAndAccumulatesActualFocusTime() {
         var stack = AttentionState()
         let original = stack.add("原任务", at: start)!

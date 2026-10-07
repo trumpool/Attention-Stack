@@ -10,11 +10,15 @@ final class StackStore: ObservableObject {
     @Published var lastCompletedID: UUID?
     @Published var storageError: String?
     @Published var celebration = 0
+    @Published var insertionPosition: InsertionPosition = .front {
+        didSet { UserDefaults.standard.set(insertionPosition.rawValue, forKey: "insertionPosition") }
+    }
     private var toastTask: Task<Void, Never>?
     private var unreadableOriginal = false
     let fileURL: URL
 
     init() {
+        insertionPosition = InsertionPosition(rawValue: UserDefaults.standard.string(forKey: "insertionPosition") ?? "") ?? .front
         let isDemo = ProcessInfo.processInfo.arguments.contains("--demo")
         let isQA = ProcessInfo.processInfo.arguments.contains("--qa") || Bundle.main.bundleIdentifier?.hasSuffix(".qa") == true
         let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -52,7 +56,7 @@ final class StackStore: ObservableObject {
 
     func add(_ title: String) {
         guard !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
-        mutate { $0.add(title) }
+        mutate { $0.add(title, position: insertionPosition) }
     }
 
     func complete() {
@@ -65,7 +69,11 @@ final class StackStore: ObservableObject {
 
     func promote(_ id: UUID) { mutate { $0.promote(id) } }
     func move(_ id: UUID, before target: UUID?) { mutate { $0.move(id, before: target) } }
-    func restore(_ id: UUID) { mutate { $0.restore(id) }; showToast("已放回待办栈") }
+    func restore(_ id: UUID) {
+        let hadCurrent = state.current != nil
+        mutate { $0.restore(id, position: insertionPosition) }
+        showToast(hadCurrent ? "已放回待办\(insertionPosition == .front ? "前面" : "后面")" : "已重新开始专注")
+    }
     func rename(_ id: UUID, to title: String) { mutate { $0.rename(id, to: title) } }
     func undo() {
         guard let id = lastCompletedID else { return }

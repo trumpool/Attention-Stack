@@ -25,7 +25,12 @@ public struct AttentionItem: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-/// New thoughts enter the top of the stack without interrupting the active task.
+public enum InsertionPosition: String, CaseIterable, Sendable {
+    case front
+    case back
+}
+
+/// New thoughts enter the waiting list without interrupting the active task.
 public struct AttentionState: Codable, Equatable, Sendable {
     public var current: AttentionItem?
     public var pending: [AttentionItem]
@@ -38,15 +43,17 @@ public struct AttentionState: Codable, Equatable, Sendable {
     }
 
     @discardableResult
-    public mutating func add(_ title: String, at date: Date = Date()) -> UUID? {
+    public mutating func add(_ title: String, position: InsertionPosition = .front, at date: Date = Date()) -> UUID? {
         let title = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !title.isEmpty else { return nil }
         var item = AttentionItem(title: title, at: date)
         if current == nil {
             item.focusedAt = date
             current = item
-        } else {
+        } else if position == .front {
             pending.insert(item, at: 0)
+        } else {
+            pending.append(item)
         }
         return item.id
     }
@@ -84,10 +91,10 @@ public struct AttentionState: Codable, Equatable, Sendable {
         }
     }
 
-    public mutating func restore(_ id: UUID, at date: Date = Date()) {
+    public mutating func restore(_ id: UUID, position: InsertionPosition = .front, at date: Date = Date()) {
         guard let original = archive.first(where: { $0.id == id }) else { return }
         // Repeating a task is a new attempt; its previous completion stays archived.
-        add(original.title, at: date)
+        add(original.title, position: position, at: date)
     }
 
     public mutating func undoCompletion(_ id: UUID, at date: Date = Date()) {

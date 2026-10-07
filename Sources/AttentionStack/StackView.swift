@@ -304,6 +304,25 @@ struct StackView: View {
                 .textFieldStyle(.plain).font(.system(size: 12))
                 .focused($inputFocused).onSubmit(addDraft)
                 .accessibilityLabel("新的待办事项")
+            Menu {
+                Picker("入栈位置", selection: $store.insertionPosition) {
+                    Text("前面 · 优先接续").tag(InsertionPosition.front)
+                    Text("后面 · 按序等待").tag(InsertionPosition.back)
+                }
+                .pickerStyle(.inline)
+            } label: {
+                HStack(spacing: 4) {
+                    Text(store.insertionPosition == .front ? "前面" : "后面")
+                    Image(systemName: "chevron.down").font(.system(size: 8, weight: .semibold))
+                }
+                .font(.system(size: 10, weight: .medium))
+                .padding(.horizontal, 8).padding(.vertical, 6)
+                .background(Palette.lilac.opacity(0.09), in: RoundedRectangle(cornerRadius: 6))
+            }
+            .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
+            .foregroundStyle(Palette.lilac)
+            .help("选择新事项放在待办前面或后面，不打断当前专注")
+            .accessibilityLabel("入栈位置：\(store.insertionPosition == .front ? "前面" : "后面")")
             Button(action: addDraft) {
                 Image(systemName: "arrow.turn.down.left").font(.system(size: 10, weight: .medium))
                     .frame(width: 25, height: 25)
@@ -426,7 +445,7 @@ struct StackView: View {
                 }
             } else {
                 Image(systemName: "arrow.down.to.line.compact")
-                Text("最近入栈的想法，会先接续")
+                Text(store.insertionPosition == .front ? "新事项放在前面，优先接续" : "新事项放在后面，按序等待")
                 Spacer()
             }
         }
