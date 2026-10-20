@@ -165,39 +165,61 @@ final class PanelCoordinator: ObservableObject {
 struct WindowDragRegion: NSViewRepresentable {
     var onClick: () -> Void
     var onDragEnded: () -> Void
+    var isClickable = true
 
-    func makeNSView(context: Context) -> DragView { DragView(onClick: onClick, onDragEnded: onDragEnded) }
+    func makeNSView(context: Context) -> DragView {
+        DragView(onClick: onClick, onDragEnded: onDragEnded, isClickable: isClickable)
+    }
     func updateNSView(_ view: DragView, context: Context) {
         view.onClick = onClick
         view.onDragEnded = onDragEnded
+        view.isClickable = isClickable
     }
 
     final class DragView: NSView {
         var onClick: () -> Void
         var onDragEnded: () -> Void
-        init(onClick: @escaping () -> Void, onDragEnded: @escaping () -> Void) {
+        var isClickable: Bool { didSet { setAccessibilityElement(isClickable) } }
+        private var dragStart: NSPoint?
+        private var windowStart: NSPoint?
+        private var isDragging = false
+
+        init(onClick: @escaping () -> Void, onDragEnded: @escaping () -> Void, isClickable: Bool) {
             self.onClick = onClick
             self.onDragEnded = onDragEnded
+            self.isClickable = isClickable
             super.init(frame: .zero)
-            setAccessibilityElement(true)
+            setAccessibilityElement(isClickable)
             setAccessibilityRole(.button)
             setAccessibilityLabel("展开或收起 Attention Stack；拖动以移动面板")
         }
         required init?(coder: NSCoder) { fatalError("init(coder:) is unsupported") }
-        override func accessibilityPerformPress() -> Bool { onClick(); return true }
+        override func accessibilityPerformPress() -> Bool {
+            guard isClickable else { return false }
+            onClick()
+            return true
+        }
         override func resetCursorRects() { addCursorRect(bounds, cursor: .openHand) }
         override func mouseDown(with event: NSEvent) {
             guard let window else { return }
-            let origin = event.locationInWindow
-            while let next = window.nextEvent(matching: [.leftMouseDragged, .leftMouseUp]) {
-                if next.type == .leftMouseUp { onClick(); return }
-                let distance = hypot(next.locationInWindow.x - origin.x, next.locationInWindow.y - origin.y)
-                if distance > 3 {
-                    window.performDrag(with: next)
-                    onDragEnded()
-                    return
-                }
-            }
+            dragStart = window.convertPoint(toScreen: event.locationInWindow)
+            windowStart = window.frame.origin
+            isDragging = false
+        }
+        override func mouseDragged(with event: NSEvent) {
+            guard let window, let start = dragStart, let origin = windowStart else { return }
+            let point = window.convertPoint(toScreen: event.locationInWindow)
+            let dx = point.x - start.x
+            let dy = point.y - start.y
+            guard isDragging || hypot(dx, dy) > 3 else { return }
+            isDragging = true
+            window.setFrameOrigin(NSPoint(x: origin.x + dx, y: origin.y + dy))
+        }
+        override func mouseUp(with event: NSEvent) {
+            guard dragStart != nil else { return }
+            defer { dragStart = nil; windowStart = nil; isDragging = false }
+            if isDragging { onDragEnded() }
+            else if isClickable { onClick() }
         }
     }
 }

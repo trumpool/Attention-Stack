@@ -37,6 +37,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(withTitle: "Attention Stack", action: nil, keyEquivalent: "")
         menu.addItem(.separator())
         menu.addItem(menuItem("展开专注栈", action: #selector(showStack), key: ""))
+        menu.addItem(menuItem("收起专注栈", action: #selector(collapseStack), key: ""))
         menu.addItem(menuItem("添加一个想法…", action: #selector(addIdea), key: "n"))
         menu.addItem(menuItem("查看归档", action: #selector(showArchive), key: ""))
         menu.addItem(menuItem("回到屏幕顶部", action: #selector(moveHome), key: ""))
@@ -54,10 +55,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func showStack() { coordinator.expand() }
+    @objc private func collapseStack() { coordinator.show(); coordinator.collapse() }
     @objc private func addIdea() { coordinator.expand(focusInput: true) }
     @objc private func showArchive() { coordinator.expand(); coordinator.showingArchive = true }
     @objc private func moveHome() { coordinator.home() }
     @objc private func hideStack() { coordinator.hide() }
     @objc private func quit() { NSApp.terminate(nil) }
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        coordinator.show()
+        return false
+    }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 }

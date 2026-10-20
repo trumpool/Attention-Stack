@@ -103,6 +103,17 @@ struct StackView: View {
                 }
             }
             .overlay(WindowDragRegion(onClick: coordinator.toggle, onDragEnded: coordinator.didDrag))
+            Button(action: { coordinator.expand() }) {
+                HStack(spacing: 5) {
+                    Text("展开")
+                    Image(systemName: "chevron.down").font(.system(size: 9, weight: .semibold))
+                }
+                .font(.system(size: 10, weight: .medium))
+                .padding(.horizontal, 8).frame(height: 28)
+                .background(Palette.lilac.opacity(0.12), in: Capsule())
+            }
+            .buttonStyle(SoftPressStyle()).fixedSize().foregroundStyle(Palette.lilac)
+            .help("展开专注栈").accessibilityLabel("展开专注栈")
             if store.state.current != nil {
                 completeButton(size: 28)
             } else {
@@ -127,6 +138,8 @@ struct StackView: View {
 
     private var expanded: some View {
         VStack(spacing: 0) {
+            header
+                .padding(.horizontal, 20).padding(.top, 20).padding(.bottom, 15)
             Group {
                 if coordinator.height < 570 {
                     ScrollView { expandedContent }.scrollIndicators(.visible)
@@ -156,7 +169,6 @@ struct StackView: View {
 
     private var expandedContent: some View {
         VStack(spacing: 15) {
-            header
             tabs
             if let error = store.storageError {
                 Text(error).font(.system(size: 10)).foregroundStyle(.orange)
@@ -173,7 +185,7 @@ struct StackView: View {
             }
             footer
         }
-        .padding(.horizontal, 20).padding(.top, 20).padding(.bottom, 8)
+        .padding(.horizontal, 20).padding(.bottom, 8)
     }
 
     private var heightHandle: some View {
@@ -204,7 +216,7 @@ struct StackView: View {
                 }
                 Spacer(minLength: 0)
             }
-            .overlay(WindowDragRegion(onClick: {}, onDragEnded: coordinator.didDrag))
+            .overlay(WindowDragRegion(onClick: {}, onDragEnded: coordinator.didDrag, isClickable: false))
             Menu {
                 Button("回到屏幕顶部", action: coordinator.home)
                 Button("导出归档…", action: store.exportArchive)
@@ -217,10 +229,15 @@ struct StackView: View {
             .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize()
             .foregroundStyle(Palette.muted).help("更多选项")
             Button(action: coordinator.collapse) {
-                Image(systemName: "chevron.up").font(.system(size: 11, weight: .semibold))
-                    .frame(width: 28, height: 28).background(.white.opacity(0.05), in: Circle())
+                HStack(spacing: 5) {
+                    Text("收起")
+                    Image(systemName: "chevron.up").font(.system(size: 9, weight: .semibold))
+                }
+                .font(.system(size: 10, weight: .medium))
+                .padding(.horizontal, 8).frame(height: 28)
+                .background(Palette.lilac.opacity(0.12), in: Capsule())
             }
-            .buttonStyle(.plain).foregroundStyle(Palette.muted).help("收起 · Esc")
+            .buttonStyle(SoftPressStyle()).fixedSize().foregroundStyle(Palette.lilac).help("收起 · Esc")
             .accessibilityLabel("收起专注栈")
         }
     }

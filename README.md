@@ -10,7 +10,7 @@
 
 ### 安装
 
-[下载 DMG 安装包 · v1.2.0](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.2.0-arm64.dmg)
+[下载 DMG 安装包 · v1.2.1](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.2.1-arm64.dmg)
 
 双击打开，把 `Attention Stack.app` 拖进 `Applications`，再从「应用程序」启动。
 
@@ -24,6 +24,8 @@ open -a "Attention Stack"
 
 当前构建采用临时签名，尚未做 Apple 公证。如果 macOS 阻止首次打开，请在「系统设置 → 隐私与安全性」中查看这次打开提示。
 
+如果 Homebrew 显示已安装，但「应用程序」中的应用丢失，可运行 `brew reinstall --cask trumpool/attention-stack/attention-stack` 恢复安装，事项和归档会保留。
+
 ### 使用
 
 - 输入想法，按 Return 入栈，不打断当前专注。
@@ -31,7 +33,7 @@ open -a "Attention Stack"
 - 勾选当前事项：自动归档，开始待办最前面的事项；完成提示支持短暂撤销。
 - 拖动待办到专注区可立即切换；拖动列表中的事项可调整顺序。
 - 拖动面板底部的高度手柄，增高或缩短待办区域；高度会记住，并限制在屏幕内。右侧滚动条可直接拖动，查看更多事项。
-- 点击顶部胶囊展开，按 Esc 收起；拖动标题区域移动窗口。
+- 点击胶囊右侧「展开」打开完整列表，点击固定在顶部的「收起」或按 Esc 收回；菜单栏也提供展开和收起。拖动标题区域移动窗口，隐藏后重新打开应用可找回悬浮窗。
 - 归档包含入栈时间、出栈时间和专注时长，支持搜索、JSON 导出及再次入栈。
 
 **离线使用，无需账号。** 事项和归档只保存在本机，重启后恢复。数据位置：`~/Library/Application Support/Attention Stack/stack.json`。专注时长会包含应用关闭期间当前事项仍处于专注的时间。
@@ -55,7 +57,7 @@ Requires an **Apple Silicon Mac and macOS 14 or later**.
 
 ### Install
 
-[Download the DMG installer · v1.2.0](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.2.0-arm64.dmg)
+[Download the DMG installer · v1.2.1](https://github.com/trumpool/Attention-Stack/raw/refs/heads/main/downloads/Attention-Stack-1.2.1-arm64.dmg)
 
 Open the DMG, drag `Attention Stack.app` into `Applications`, then launch it from Applications.
 
@@ -69,6 +71,8 @@ open -a "Attention Stack"
 
 This build is ad-hoc signed and is not notarized by Apple. If macOS blocks the first launch, review the prompt in **System Settings → Privacy & Security**.
 
+If Homebrew reports the app as installed but it is missing from Applications, run `brew reinstall --cask trumpool/attention-stack/attention-stack`. Your tasks and archive are preserved.
+
 ### Use
 
 - Type a thought and press Return to add it without interrupting your current task.
@@ -76,7 +80,7 @@ This build is ad-hoc signed and is not notarized by Apple. If macOS blocks the f
 - Check off the current task to archive it and start the first waiting task. A brief undo option is available.
 - Drag a waiting task into the focus area to start it, or drag tasks within the list to reorder them.
 - Drag the height handle at the bottom to resize the waiting area. The height is remembered and stays within the screen. Drag the scrollbar on the right to see more tasks.
-- Click the top pill to expand, press Esc to collapse, and drag the header to move the window.
+- Click Expand (展开) on the pill to open the full list. Click Collapse (收起) in the fixed header or press Esc to collapse. Both actions are also in the menu bar. Drag the header to move the window; reopening a hidden app brings its panel back.
 - The archive records enqueue and completion times, plus focus duration. Search, export to JSON, or repeat an archived task.
 
 **Works offline. No account required.** Tasks and history stay on your Mac and are restored when you reopen the app. Data is stored at `~/Library/Application Support/Attention Stack/stack.json`. Focus duration includes time while the app is closed if the task remains current.
